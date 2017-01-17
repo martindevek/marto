@@ -148,22 +148,24 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     maze.distances[startRow][startColumn] = distance
     maze.parentCoords[startRow][startColumn] = parentCoords
 
-    maze.updatePosition(startRow, startColumn, TRIED)
+    # maze.updatePosition(startRow, startColumn, TRIED)
 
     # Otherwise, use logical short circuiting to try each direction
     # in turn (if needed)
-    found = searchFrom(maze, startRow-1, startColumn, distance+1, Coords(startRow, startColumn)) or \
-            searchFrom(maze, startRow+1, startColumn, distance+1, Coords(startRow, startColumn)) or \
-            searchFrom(maze, startRow, startColumn-1, distance+1, Coords(startRow, startColumn)) or \
-            searchFrom(maze, startRow, startColumn+1, distance+1, Coords(startRow, startColumn))
+    searchFrom(maze, startRow-1, startColumn, distance+1, Coords(startRow, startColumn))
+    searchFrom(maze, startRow+1, startColumn, distance+1, Coords(startRow, startColumn))
+    searchFrom(maze, startRow, startColumn-1, distance+1, Coords(startRow, startColumn))
+    searchFrom(maze, startRow, startColumn+1, distance+1, Coords(startRow, startColumn))
+
+    # maze.updatePosition(startRow, startColumn, TRIED)
 
 
 def exitMaze(maze, coords):
-    print(coords)
+    # print(coords)
 
     if coords:
-        print (coords.row)
-        print (coords.col)
+        # print (coords.row)
+        # print (coords.col)
         maze.updatePosition(coords.row, coords.col, PART_OF_PATH)
         exitMaze(maze, maze.parentCoords[coords.row][coords.col])
 
@@ -179,7 +181,7 @@ if myMaze.exitCoords:
 else:
     print ("No way out")
 
-
+input("press enter")
 # if found:
 #     maze.updatePosition(startRow, startColumn, PART_OF_PATH)
 # else:
