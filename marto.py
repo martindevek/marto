@@ -139,7 +139,7 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     if maze.isExit(startRow,startColumn):
         #maze.updatePosition(startRow, startColumn, PART_OF_PATH)
         maze.exitCoords = Coords(startRow, startColumn)
-        return True
+        # return True
     # 4. If we founded a shortest path before
     if maze.distances[startRow][startColumn] <= distance:
         return False
@@ -165,7 +165,8 @@ def exitMaze(maze, coords):
         print (coords.row)
         print (coords.col)
         maze.updatePosition(coords.row, coords.col, PART_OF_PATH)
-        exitMaze(maze, maze.parentCoords)
+        exitMaze(maze, maze.parentCoords[coords.row][coords.col])
+
 
 myMaze = Maze('maze2.txt')
 myMaze.drawMaze()
