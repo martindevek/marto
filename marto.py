@@ -159,6 +159,8 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
 
 
 def exitMaze(maze, coords):
+    print(coords)
+
     if coords:
         print (coords.row)
         print (coords.col)
