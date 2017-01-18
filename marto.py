@@ -10,9 +10,11 @@ class Maze:
         rowsInMaze = 0
         columnsInMaze = 0
         self.mazelist = []
-        self.distances = []
-        self.parentCoords = []
-        self.exitCoords = None
+
+        self.distances = [] # distancia minima tentativa a la posicion de salida
+        self.parentCoords = [] # coordenadas del nodo padre de donde proviene el camino minimo tentativo
+        self.exitCoords = None # coordenadas de la salida del laberinto
+
         mazeFile = open(mazeFileName,'r')
         rowsInMaze = 0
         for line in mazeFile:
@@ -95,32 +97,17 @@ class Maze:
         if color:
             self.dropBreadcrumb(color)
 
-    # def setDistanceFromStart(self, row, col, dist):
-    #     self.distances[row][col] = dist
-    #
-    # def getDistanceFromStart(self, row, col):
-    #     return self.distances[row][col]
-    #
-    # def setParentCoords(self, row, col, parentCoords):
-    #     self.parentCoords[row][col] = parentCoords
-    #
-    # def getParentCoords(self, row, col):
-    #     return self.parentsCoords[row][col]
-
     def isExit(self, row, col):
         return (row == 0 or
                 row == self.rowsInMaze-1 or
                 col == 0 or
                 col == self.columnsInMaze-1 )
 
-    # def setExit(self, row, col)
-    #     self.mazeExitCords = Coords(row, col)
-
     def __getitem__(self,idx):
         return self.mazelist[idx]
 
 class Coords:
-
+# Clase que representa un par de coordenadas
     def __init__(self, row, col):
         self.row = row
         self.col = col
@@ -131,24 +118,24 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     #  1. We have run into an obstacle, return false
     maze.updatePosition(startRow, startColumn)
     if maze[startRow][startColumn] == OBSTACLE :
-        return False
+        return
     #  2. We have found a square that has already been explored
     if maze[startRow][startColumn] == TRIED or maze[startRow][startColumn] == DEAD_END:
-        return False
+        return
     # 3. We have found an outside edge not occupied by an obstacle
     if maze.isExit(startRow,startColumn):
-        #maze.updatePosition(startRow, startColumn, PART_OF_PATH)
         maze.exitCoords = Coords(startRow, startColumn)
-        # return True
     # 4. If we founded a shortest path before
+    # in reference to exit coords
+    if maze.exitCoords and maze.distances[maze.exitCoords.row][maze.exitCoords.col] <= distance:
+        return
+    # in reference to the actual coords
     if maze.distances[startRow][startColumn] <= distance:
-        return False
-    # We founded a shortest path until now
-    # maze.setDistanceFromStart(startRow, startColumn, distance)
-    maze.distances[startRow][startColumn] = distance
-    maze.parentCoords[startRow][startColumn] = parentCoords
+        return
 
-    # maze.updatePosition(startRow, startColumn, TRIED)
+    # We founded a shortest path until now
+    maze.distances[startRow][startColumn] = distance # seteamos la nueva distancia minima tentativa
+    maze.parentCoords[startRow][startColumn] = parentCoords # nodo padre de donde proviene el camino minimo tentativo
 
     # Otherwise, use logical short circuiting to try each direction
     # in turn (if needed)
@@ -157,19 +144,15 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     searchFrom(maze, startRow, startColumn-1, distance+1, Coords(startRow, startColumn))
     searchFrom(maze, startRow, startColumn+1, distance+1, Coords(startRow, startColumn))
 
-    # maze.updatePosition(startRow, startColumn, TRIED)
-
 
 def exitMaze(maze, coords):
-    # print(coords)
-
+# funcion recursiva que se llama inicialmente con las coordenadas de la salida y recorre los nodos padre hasta llegar al punto de partida
     if coords:
-        # print (coords.row)
-        # print (coords.col)
         maze.updatePosition(coords.row, coords.col, PART_OF_PATH)
         exitMaze(maze, maze.parentCoords[coords.row][coords.col])
 
 
+# MAIN PROGRAM
 myMaze = Maze('maze2.txt')
 myMaze.drawMaze()
 myMaze.updatePosition(myMaze.startRow,myMaze.startCol)
@@ -182,8 +165,3 @@ else:
     print ("No way out")
 
 input("press enter")
-# if found:
-#     maze.updatePosition(startRow, startColumn, PART_OF_PATH)
-# else:
-#     maze.updatePosition(startRow, startColumn, DEAD_END)
-# return found
