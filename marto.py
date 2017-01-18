@@ -116,7 +116,7 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     # try each of four directions from this point until we find a way out.
     # base Case return values:
     #  1. We have run into an obstacle, return false
-    maze.updatePosition(startRow, startColumn)
+    # maze.updatePosition(startRow, startColumn)
     if maze[startRow][startColumn] == OBSTACLE :
         return
     #  2. We have found a square that has already been explored
@@ -136,6 +136,8 @@ def searchFrom(maze, startRow, startColumn, distance, parentCoords):
     # We founded a shortest path until now
     maze.distances[startRow][startColumn] = distance # seteamos la nueva distancia minima tentativa
     maze.parentCoords[startRow][startColumn] = parentCoords # nodo padre de donde proviene el camino minimo tentativo
+
+    maze.updatePosition(startRow, startColumn)
 
     # Otherwise, use logical short circuiting to try each direction
     # in turn (if needed)
