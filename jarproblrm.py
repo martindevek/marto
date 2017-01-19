@@ -1,3 +1,4 @@
+# declaro la clase a objeto de mantener mas legible el código
 class Jar:
     def __init__(self, name, capacity):
         self.name = name
@@ -27,28 +28,31 @@ class Jar:
     def state(self):
         return self.name + " capacity: " + str(self.capacity) + " - content: " + str(self.content)
 
-
+# se encarga de arrancar la recursión y comprobar que la solución sea posible dada las capacidades de cada jarra
 def jarSolver(jarA, jarB, solution):
     if jarA.capacity < solution and jarB.capacity < solution:
         return None
 
-    history = []
-    jarRecursion(jarA, jarB, solution, history, "")
+    history = [] # lista que va a contener el historial de estados de las jarras
+    jarRecursion(jarA, jarB, solution, history, "") # lanza la recursión
     return history
 
+# función recursiva que
 def jarRecursion(jarA, jarB, solution, history, state):
 
+    print(jarA.state() + " // " + jarB.state() + "\n")
     if jarA.content == solution or jarB.content == solution:
         return True
 
+    # este buble se repite hasta que las jarras queden en un estado en el cual no hayan estado antes
     while state in history:
         state = doAction(jarA, jarB)
-        jarA, jarB = jarB, jarA
+        jarA, jarB = jarB, jarA # hace un swap en las variables
 
-    history.append(state)
+    history.append(state) # agrega el estado actaul al historial
     jarRecursion(jarB, jarA, solution, history, state)
 
-
+# ejecuta una acción con las jarras
 def doAction(jarA, jarB):
 
     # pass jar_a to jar_b
