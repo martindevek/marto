@@ -1,20 +1,14 @@
 class Jar:
-    def __init__(self, capacity):
+    def __init__(self, name, capacity):
+        self.name = name
         self.capacity = capacity
         self.content = 0
 
     def fill(self):
-        if self.content < self.capacity:
-            self.content = self.capacity
-            return True
-
-    def fillWith(self, cant):
-        self.content = min(self.capacity, self.content+cant)
+        self.content = self.capacity
 
     def empty(self):
-        if self.capacity > 0:
-            self.content = 0
-            return True
+        self.content = 0
 
     def ifEmpty(self):
         return self.capacity == 0
@@ -23,61 +17,63 @@ class Jar:
         return self.content >= self.capacity
 
     def toJar(self, otherJar):
-        if (not self.empty) and (not otherJar.isFull):
-            aux = self.content
-            self.content = min(self.content - otherJar.left, 0)
-            otherJar.content = max(aux + otherJer.content, otherJar.capacity)
-            return True
+        aux = self.content
+        self.content = max(self.content - otherJar.left(), 0)
+        otherJar.content = min(aux + otherJar.content, otherJar.capacity)
+
+    def left(self):
+        return self.capacity - self.content
+
+    def state(self):
+        return self.name + " capacity: " + str(self.capacity) + " - content: " + str(self.content)
 
 
 def jarSolver(jarA, jarB, solution):
     if jarA.capacity < solution and jarB.capacity < solution:
         return None
 
-    return jarRecursion(jarA, jarB, solution, "")
+    history = []
+    jarRecursion(jarA, jarB, solution, history, "")
+    return history
 
-def jarRecursion(jarA, jarB, solution, action):
-
-    print("jarA="+str(jarA.content)+"\njarB="+str(jarB.content)+"\n\n")
+def jarRecursion(jarA, jarB, solution, history, state):
 
     if jarA.content == solution or jarB.content == solution:
-        print(action)
         return True
 
-    # fill jar_a
-    if jarA.fill():
-        jarRecursion(jarA, jarB, solution, "Fill Jar A\n")
+    while state in history:
+        state = doAction(jarA, jarB)
+        jarA, jarB = jarB, jarA
+
+    history.append(state)
+    jarRecursion(jarB, jarA, solution, history, state)
+
+
+def doAction(jarA, jarB):
 
     # pass jar_a to jar_b
-    if jarA.toJar(jarB):
-        jarRecursion(jarA, jarB, solution, "Pass A to B\n")
+    if jarA.content > 0 and jarB.content < jarB.capacity:
+        jarA.toJar(jarB)
 
-    # fill jar_b
-    if jarB.fill():
-        jarRecursion(jarA, jarB, solution, "Fill Jar B\n")
-
-    # pass jar_b to jar_a
-    if jarB.toJar(jarA):
-        jarRecursion(jarA, jarB, solution, "Pass B to A\n")
+    # fill jar_a
+    elif jarA.content < jarA.capacity:
+        jarA.fill()
 
     # empty jar_a
-    if jarA.empty():
-        jarRecursion(jarA, jarB, solution, "Empty Jar A\n")
+    elif jarA.content > 0:
+        jarA.empty()
 
-    # empty jar_b
-    if jarB.empty():
-        jarRecursion(jarA, jarB, solution, "Empty Jar B\n")
-
+    return jarA.state() + " // " + jarB.state()
 
 # MAIN PROGRAM
 JAR_A = 4
 JAR_B = 3
 SOLUTION = 2
 
-jarA = Jar(JAR_A)
-jarB = Jar(JAR_B)
+jarA = Jar("Jar A", JAR_A)
+jarB = Jar("Jar B", JAR_B)
 
 sol = jarSolver(jarA, jarB, SOLUTION)
 
-if not sol:
-    print("There are no posible solution.\n")
+for line in sol:
+    print(line)
