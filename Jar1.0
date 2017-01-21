@@ -1,0 +1,85 @@
+# declare the class
+class Jar:
+    # defining the attributes of an instance right after its creation
+    def __init__(self, name, capacity):
+        self.name = name
+        self.capacity = capacity
+        self.content = 0
+
+    # filling funtion => capacity
+    def fill(self):
+        self.content = self.capacity
+
+   # emptying funtion => 0
+    def empty(self):
+        self.content = 0
+
+    def ifEmpty(self):
+        return self.capacity == 0
+
+    def isFull(self):
+        return self.content >= self.capacity
+
+    def toJar(self, otherJar):
+        aux = self.content
+        self.content = max(self.content - otherJar.left(), 0)
+        otherJar.content = min(aux + otherJar.content, otherJar.capacity)
+
+    def left(self):
+        return self.capacity - self.content
+
+    def state(self):
+        return self.name + " capacity: " + str(self.capacity) + " - content: " + str(self.content)
+
+# function that starts the recursion and checks that the solution is possible
+def jarSolver(jarA, jarB, solution):
+    if jarA.capacity < solution and jarB.capacity < solution:
+        return None
+
+    history = [] # List that will contain the jar content historial
+    jarRecursion(jarA, jarB, solution, history, "") # starts the recursion
+    return history
+
+def jarRecursion(jarA, jarB, solution, history, state):
+
+    print(jarA.state() + " // " + jarB.state() + "\n")
+    if jarA.content == solution or jarB.content == solution:
+        return True
+
+    # While there are states that haven't been changed keep looping
+    while state in history:
+        state = doAction(jarA, jarB)
+        jarA, jarB = jarB, jarA # swap variables
+
+    history.append(state) # append actual state to historial
+    jarRecursion(jarB, jarA, solution, history, state)
+
+# This function executes an accion: filling, emptying, moving from one to the other
+def doAction(jarA, jarB):
+
+    # pass jar_a to jar_b
+    if jarA.content > 0 and jarB.content < jarB.capacity:
+        jarA.toJar(jarB)
+
+    # fill jar_a
+    elif jarA.content < jarA.capacity:
+        jarA.fill()
+
+    # empty jar_a
+    elif jarA.content > 0:
+        jarA.empty()
+
+    return jarA.state() + " // " + jarB.state()
+
+# MAIN PROGRAM
+JAR_A = int(input("Please enter the value of JAR_A: "))
+JAR_B = int(input("Please enter the value of JAR_B: "))
+SOLUTION = int(input("Please enter the value of the GOAL: "))
+
+jarA = Jar("Jar A", JAR_A)
+jarB = Jar("Jar B", JAR_B)
+
+sol = jarSolver(jarA, jarB, SOLUTION)
+
+for line in sol:
+    print(line)
